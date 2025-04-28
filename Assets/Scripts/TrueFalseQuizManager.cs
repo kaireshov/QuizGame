@@ -5,21 +5,29 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-public class QuizManager : MonoBehaviour
+[System.Serializable]
+public class TrueFalseQuestion
+{
+    public string questionText;
+    public bool isTrue;
+}
+
+public class TrueFalseQuizManager : MonoBehaviour
 {
     public TextMeshProUGUI questionText;
-    public Button[] optionButtons;
+    public Button trueButton;
+    public Button falseButton;
     public TextMeshProUGUI feedbackText;
     public Button nextButton;
     public TextMeshProUGUI scoreText;
     public Image background;
 
-    public List<Question> questions;
+    public List<TrueFalseQuestion> questions;
     private int currentQuestionIndex = 0;
     private bool answered = false;
 
-    public int pointsPerCorrectAnswer = 10; // Уровень 1: 10, Уровень 2: 20, Уровень 3: 30
-    public string nextLevelSceneName = "Level2"; // Название сцены следующего уровня
+    public int pointsPerCorrectAnswer = 20;
+    public string nextLevelSceneName = "Level3";
 
     void Start()
     {
@@ -33,32 +41,34 @@ public class QuizManager : MonoBehaviour
         feedbackText.text = "";
         background.color = Color.white;
 
-        Question q = questions[currentQuestionIndex];
+        TrueFalseQuestion q = questions[currentQuestionIndex];
         questionText.text = q.questionText;
 
-        for (int i = 0; i < optionButtons.Length; i++)
-        {
-            optionButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = q.options[i];
-            optionButtons[i].interactable = true;
-            optionButtons[i].GetComponent<Image>().color = Color.white; // сбрасываем цвет
-            int index = i;
-            optionButtons[i].onClick.RemoveAllListeners();
-            optionButtons[i].onClick.AddListener(() => OnOptionSelected(index));
-        }
+        trueButton.interactable = true;
+        falseButton.interactable = true;
+
+        trueButton.GetComponent<Image>().color = Color.white;
+        falseButton.GetComponent<Image>().color = Color.white;
+
+        trueButton.onClick.RemoveAllListeners();
+        falseButton.onClick.RemoveAllListeners();
+
+        trueButton.onClick.AddListener(() => OnAnswerSelected(true));
+        falseButton.onClick.AddListener(() => OnAnswerSelected(false));
 
         UpdateScoreText();
     }
 
-    void OnOptionSelected(int index)
+    void OnAnswerSelected(bool answer)
     {
         if (answered) return;
 
         answered = true;
-        Question q = questions[currentQuestionIndex];
+        TrueFalseQuestion q = questions[currentQuestionIndex];
 
-        if (index == q.correctOptionIndex)
+        if (answer == q.isTrue)
         {
-            feedbackText.text = "Correct! +10";
+            feedbackText.text = "Correct! +20";
             background.color = Color.green;
             ScoreManager.instance.AddScore(pointsPerCorrectAnswer);
             StartCoroutine(NextQuestionAfterDelay());
@@ -67,19 +77,24 @@ public class QuizManager : MonoBehaviour
         {
             feedbackText.text = "Wrong!";
             background.color = Color.red;
-            HighlightCorrectAnswer(q.correctOptionIndex);
+            HighlightCorrectAnswer(q.isTrue);
             StartCoroutine(NextQuestionAfterDelay());
         }
 
-        foreach (var button in optionButtons)
-        {
-            button.interactable = false;
-        }
+        trueButton.interactable = false;
+        falseButton.interactable = false;
     }
 
-    void HighlightCorrectAnswer(int correctIndex)
+    void HighlightCorrectAnswer(bool correctAnswer)
     {
-        optionButtons[correctIndex].GetComponent<Image>().color = Color.green;
+        if (correctAnswer)
+        {
+            trueButton.GetComponent<Image>().color = Color.green;
+        }
+        else
+        {
+            falseButton.GetComponent<Image>().color = Color.green;
+        }
     }
 
     IEnumerator NextQuestionAfterDelay()
@@ -94,7 +109,6 @@ public class QuizManager : MonoBehaviour
         }
         else
         {
-            // Все вопросы закончились, включаем кнопку Next для перехода на следующий уровень
             feedbackText.text = "Level Complete!";
             nextButton.gameObject.SetActive(true);
         }
