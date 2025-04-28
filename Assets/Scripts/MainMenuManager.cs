@@ -11,6 +11,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void ExitGame()
     {
+        UnityEditor.EditorApplication.isPlaying = false;
         Application.Quit();
         Debug.Log("Game Closed"); // в редакторе Unity не закроется, только в сборке
     }
