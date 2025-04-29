@@ -14,6 +14,10 @@ public class WordPuzzleManager : MonoBehaviour
     public Button nextButton;
     public TextMeshProUGUI scoreText;
     public Image background;
+    public AudioSource audioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+
 
     public List<WordQuestion> questions;
     private int currentQuestionIndex = 0;
@@ -52,12 +56,14 @@ public class WordPuzzleManager : MonoBehaviour
         if (playerAnswer == correctAnswer)
         {
             feedbackText.text = "Correct! +30";
+            audioSource.PlayOneShot(correctSound);
             background.color = Color.green;
             ScoreManager.instance.AddScore(pointsPerCorrectAnswer);
         }
         else
         {
             feedbackText.text = $"Wrong! Correct answer: {q.correctWord}";
+            audioSource.PlayOneShot(wrongSound);
             background.color = Color.red;
         }
 

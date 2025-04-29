@@ -13,6 +13,10 @@ public class QuizManager : MonoBehaviour
     public Button nextButton;
     public TextMeshProUGUI scoreText;
     public Image background;
+    public AudioSource audioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+
 
     public List<Question> questions;
     private int currentQuestionIndex = 0;
@@ -59,6 +63,7 @@ public class QuizManager : MonoBehaviour
         if (index == q.correctOptionIndex)
         {
             feedbackText.text = "Correct! +10";
+            audioSource.PlayOneShot(correctSound);
             background.color = Color.green;
             ScoreManager.instance.AddScore(pointsPerCorrectAnswer);
             StartCoroutine(NextQuestionAfterDelay());
@@ -66,6 +71,7 @@ public class QuizManager : MonoBehaviour
         else
         {
             feedbackText.text = "Wrong!";
+            audioSource.PlayOneShot(wrongSound);
             background.color = Color.red;
             HighlightCorrectAnswer(q.correctOptionIndex);
             StartCoroutine(NextQuestionAfterDelay());

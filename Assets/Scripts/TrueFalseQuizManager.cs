@@ -21,6 +21,10 @@ public class TrueFalseQuizManager : MonoBehaviour
     public Button nextButton;
     public TextMeshProUGUI scoreText;
     public Image background;
+    public AudioSource audioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+
 
     public List<TrueFalseQuestion> questions;
     private int currentQuestionIndex = 0;
@@ -69,6 +73,7 @@ public class TrueFalseQuizManager : MonoBehaviour
         if (answer == q.isTrue)
         {
             feedbackText.text = "Correct! +20";
+            audioSource.PlayOneShot(correctSound);
             background.color = Color.green;
             ScoreManager.instance.AddScore(pointsPerCorrectAnswer);
             StartCoroutine(NextQuestionAfterDelay());
@@ -76,6 +81,7 @@ public class TrueFalseQuizManager : MonoBehaviour
         else
         {
             feedbackText.text = "Wrong!";
+            audioSource.PlayOneShot(wrongSound);
             background.color = Color.red;
             HighlightCorrectAnswer(q.isTrue);
             StartCoroutine(NextQuestionAfterDelay());
